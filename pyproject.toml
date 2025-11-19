@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mtm"
+version = "0.1.0"
+description = "Multi-tape Turing Machine simulator in Python"
+readme = "README.md"
+requires-python = ">=3.14"
+authors = [
+  { name = "Luisangel Parra", email = "lfaria@uninorte.edu.co" }
+]
+license = { text = "MIT" }
+
+[project.urls]
+Homepage = "https://github.com/LuisangelParra/mtm"
+
+[tool.setuptools.packages.find]
+where = ["src"]

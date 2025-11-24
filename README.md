@@ -17,6 +17,12 @@ The goal is to make it easy to **experiment with Turing Machines**, build exampl
 
 ## Installation
 
+From PyPI:
+
+```bash
+pip install multitape-tm
+```
+
 From the project root (where `pyproject.toml` lives):
 
 ```bash

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "multitape-tm"
-version = "1.0.1"
+version = "1.0.2"
 description = "Multi-tape Turing Machine simulator in Python"
 readme = "README.md"
 requires-python = ">=3.14"

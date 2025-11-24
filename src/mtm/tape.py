@@ -11,10 +11,10 @@ class Direction(IntEnum):
 
 class Tape:
     """
-    Representa una cinta infinita en ambas direcciones con un cabezal.
+    Represents a two-sided infinite tape with a single head.
 
-    Los símbolos se almacenan en un diccionario índice -> símbolo, para
-    representar sólo las celdas no blancas.
+    Symbols are stored in a dictionary index -> symbol so that
+    only non-blank cells are explicitly represented.
     """
 
     def __init__(self, blank: str = "_", initial_input: str = "") -> None:
@@ -25,11 +25,11 @@ class Tape:
         self.head: int = 0
 
     def read(self) -> str:
-        """Lee el símbolo bajo el cabezal."""
+        """Read the symbol under the head."""
         return self.cells.get(self.head, self.blank)
 
     def write(self, symbol: str) -> None:
-        """Escribe símbolo bajo el cabezal (si es blanco, limpia la celda)."""
+        """Write a symbol under the head (if it is blank, clear the cell)."""
         if symbol == self.blank and self.head in self.cells:
             del self.cells[self.head]
         else:
@@ -37,15 +37,15 @@ class Tape:
 
     def move(self, direction: int) -> None:
         """
-        Mueve el cabezal una celda.
+        Move the head one cell.
 
-        direction debe ser uno de:
+        direction must be one of:
             Direction.LEFT (-1), Direction.RIGHT (1), Direction.STAY (0)
         """
         self.head += int(direction)
 
     def __str__(self) -> str:
-        """Vista amigable de la cinta (para depuración)."""
+        """Human-readable view of the tape (for debugging)."""
         if not self.cells:
             return f"[{self.blank}]"
         indices = set(self.cells.keys()) | {self.head}

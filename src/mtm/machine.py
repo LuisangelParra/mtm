@@ -5,27 +5,27 @@ from typing import Dict, Hashable, Iterable, List, Sequence, Tuple
 from .tape import Tape, Direction
 
 
-State = Hashable  # normalmente str o int
+State = Hashable  # usually str or int
 Symbol = str
 
-# Tipo de clave de transición: (estado, (s1,...,sk))
+# Transition key type: (state, (s1,...,sk))
 TransitionKey = Tuple[State, Tuple[Symbol, ...]]
 
-# Tipo de valor de transición: (new_state, (w1,...,wk), (m1,...,mk))
+# Transition value type: (new_state, (w1,...,wk), (m1,...,mk))
 TransitionValue = Tuple[State, Tuple[Symbol, ...], Tuple[int, ...]]
 
 
 class MultiTapeTuringMachine:
     """
-    Simulador de Máquina de Turing de k-cintas.
+    k-tape Turing Machine simulator.
 
-    - states: conjunto de estados
-    - input_alphabet: símbolos de entrada
-    - tape_alphabet: símbolos de la cinta (incluye input_alphabet y blank)
-    - blank: símbolo en blanco
-    - transitions: dict que mapea
+    - states: set of states
+    - input_alphabet: input symbols
+    - tape_alphabet: tape symbols (includes input_alphabet and blank)
+    - blank: blank symbol
+    - transitions: dict mapping
         (state, (s1,...,sk)) -> (new_state, (w1,...,wk), (m1,...,mk))
-      donde mi ∈ {Direction.LEFT, Direction.RIGHT, Direction.STAY} o -1,0,1.
+      where mi ∈ {Direction.LEFT, Direction.RIGHT, Direction.STAY} or -1, 0, 1.
     """
 
     def __init__(
@@ -41,13 +41,13 @@ class MultiTapeTuringMachine:
         num_tapes: int = 1,
         initial_inputs: Sequence[str] | None = None,
     ) -> None:
-        # Conjuntos básicos
+        # Basic sets
         self.states = set(states)
         self.input_alphabet = set(input_alphabet)
         self.tape_alphabet = set(tape_alphabet)
         self.blank = blank
 
-        # Transiciones
+        # Transitions
         self.transitions: Dict[TransitionKey, TransitionValue] = transitions
 
         self.start_state = start_state
@@ -56,58 +56,58 @@ class MultiTapeTuringMachine:
 
         self.num_tapes = num_tapes
 
-        # Entradas iniciales por cinta
+        # Initial inputs per tape
         if initial_inputs is None:
             initial_inputs = [""] * num_tapes
         if len(initial_inputs) != num_tapes:
-            raise ValueError("initial_inputs debe tener longitud num_tapes.")
+            raise ValueError("initial_inputs must have length num_tapes.")
 
-        # Crear cintas
+        # Create tapes
         self.tapes: List[Tape] = [
             Tape(blank, initial_inputs[i]) for i in range(num_tapes)
         ]
 
-        # Estado inicial
+        # Initial state
         self.current_state: State = start_state
         self.step_count: int = 0
 
-    # ---------------- Métodos de utilidad ----------------
+    # ---------------- Utility methods ----------------
 
     def reset(self, initial_inputs: Sequence[str] | None = None) -> None:
-        """Reinicia la máquina con nuevas entradas opcionales."""
+        """Reset the machine with optional new inputs."""
         if initial_inputs is None:
             initial_inputs = ["" for _ in range(self.num_tapes)]
 
         if len(initial_inputs) != self.num_tapes:
-            raise ValueError("initial_inputs debe tener longitud num_tapes.")
+            raise ValueError("initial_inputs must have length num_tapes.")
 
         self.tapes = [Tape(self.blank, s) for s in initial_inputs]
         self.current_state = self.start_state
         self.step_count = 0
 
     def get_configuration(self) -> dict:
-        """Devuelve un snapshot de la configuración actual."""
+        """Return a snapshot of the current configuration."""
         return {
             "state": self.current_state,
             "tapes": [str(t) for t in self.tapes],
             "step": self.step_count,
         }
 
-    # ----------------- Paso único de simulación -----------------
+    # ----------------- Single simulation step -----------------
 
     def step(self) -> str:
         """
-        Ejecuta un paso de la TM.
+        Execute one TM step.
 
-        Devuelve:
-            - 'RUNNING' si sigue en ejecución,
-            - 'ACCEPT', 'REJECT' o 'HALT' si se detiene.
+        Returns:
+            - 'RUNNING' if the machine keeps running,
+            - 'ACCEPT', 'REJECT' or 'HALT' if it stops.
         """
-        # Leer símbolos en todas las cintas
+        # Read symbols on all tapes
         read_symbols = tuple(t.read() for t in self.tapes)
         key: TransitionKey = (self.current_state, read_symbols)
 
-        # Si no hay transición definida, la máquina se detiene
+        # If no transition is defined, the machine halts
         if key not in self.transitions:
             if self.current_state in self.accept_states:
                 return "ACCEPT"
@@ -117,33 +117,33 @@ class MultiTapeTuringMachine:
 
         new_state, write_symbols, moves = self.transitions[key]
 
-        # Escribir
+        # Write on tapes
         for t, sym in zip(self.tapes, write_symbols):
             t.write(sym)
 
-        # Mover cabezales
+        # Move heads
         for t, mv in zip(self.tapes, moves):
             t.move(mv)
 
-        # Actualizar estado
+        # Update state
         self.current_state = new_state
         self.step_count += 1
 
-        # Comprobar estados especiales
+        # Check special states
         if self.current_state in self.accept_states:
             return "ACCEPT"
         if self.current_state in self.reject_states:
             return "REJECT"
         return "RUNNING"
 
-    # --------------- Ejecución completa ----------------
+    # --------------- Full execution ----------------
 
     def run(self, max_steps: int = 10_000) -> str:
         """
-        Ejecuta hasta detenerse o hasta max_steps.
+        Run the machine until it stops or max_steps is reached.
 
-        Devuelve el estado final: 'ACCEPT', 'REJECT', 'HALT' o 'RUNNING'
-        (si se cortó por max_steps).
+        Returns the final status: 'ACCEPT', 'REJECT', 'HALT' or 'RUNNING'
+        (if it was cut off at max_steps).
         """
         status = "RUNNING"
         while status == "RUNNING" and self.step_count < max_steps:

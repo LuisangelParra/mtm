@@ -408,7 +408,9 @@ Local top-level demo scripts used for manual testing (not published) are kept ou
 ## License
 
 ```text
-MIT License
+This project is licensed under the Apache License 2.0.
+
+You are free to use, modify, and distribute this code (including in commercial and closed-source projects) as long as you keep the copyright and license notices, and respect the terms of the Apache 2.0 license.
 ```
 
 ---
